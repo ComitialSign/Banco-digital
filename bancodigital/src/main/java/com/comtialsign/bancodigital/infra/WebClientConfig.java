@@ -1,4 +1,4 @@
-package com.comtialsign.bancodigital.config;
+package com.comtialsign.bancodigital.infra;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +9,6 @@ public class WebClientConfig {
 
     @Bean
     public WebClient webClient() {
-        return WebClient.builder()
-                .baseUrl("https://util.devi.tools/api/v2/authorize")
-                .build();
+        return WebClient.builder().build();
     }
 }

@@ -62,7 +62,7 @@ public class TransactionService {
                     })
                     .block();
 
-            if(authorizationResponse != null && authorizationResponse.getStatusCode() == HttpStatus.OK) {
+            if(authorizationResponse != null && authorizationResponse.getStatusCode().is2xxSuccessful()) {
                 Map<String, String> responseBody = authorizationResponse.getBody();
                 if (responseBody != null) {
                     String message = responseBody.get("status");
