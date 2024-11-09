@@ -6,7 +6,6 @@ import com.comtialsign.bancodigital.dtos.TransactionDto;
 import com.comtialsign.bancodigital.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
