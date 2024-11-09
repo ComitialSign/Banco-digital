@@ -2,11 +2,13 @@ package com.comtialsign.bancodigital.services.impls;
 
 import com.comtialsign.bancodigital.domain.user.User;
 import com.comtialsign.bancodigital.domain.user.UserType;
+import com.comtialsign.bancodigital.dtos.UserDto;
 import com.comtialsign.bancodigital.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -29,5 +31,15 @@ public class UserService {
 
     public void saveUser(User user) throws Exception{
         this.userRepository.save(user);
+    }
+
+    public User createUser(UserDto data) throws Exception{
+        User newUser = new User(data);
+        this.userRepository.save(newUser);
+        return newUser;
+    }
+
+    public List<User> findAllUsers() throws Exception{
+        return this.userRepository.findAll();
     }
 }

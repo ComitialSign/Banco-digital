@@ -1,5 +1,6 @@
 package com.comtialsign.bancodigital.domain.user;
 
+import com.comtialsign.bancodigital.dtos.UserDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,4 +28,14 @@ public class User {
     private BigDecimal balance;
     @Enumerated(EnumType.STRING)
     private UserType userType;
+
+    public User(UserDto data) {
+        this.firstName = data.firstName();
+        this.lastName = data.lastName();
+        this.email = data.email();
+        this.document = data.document();
+        this.password = data.password();
+        this.balance = data.balance();
+        this.userType = data.userType();
+    }
 }
