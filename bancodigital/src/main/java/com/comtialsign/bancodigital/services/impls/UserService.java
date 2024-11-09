@@ -1,4 +1,4 @@
-package com.comtialsign.bancodigital.services;
+package com.comtialsign.bancodigital.services.impls;
 
 import com.comtialsign.bancodigital.domain.user.User;
 import com.comtialsign.bancodigital.domain.user.UserType;
@@ -14,7 +14,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public void validatedUser(User sender, BigDecimal amount) throws Exception{
+    public void validatedTransaction(User sender, BigDecimal amount) throws Exception{
         if(sender.getUserType() == UserType.MERCHANT){
             throw new Exception("Usuário do tipo logista não é autorizado a fazer transação");
         }

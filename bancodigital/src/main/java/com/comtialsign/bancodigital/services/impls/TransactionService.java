@@ -1,4 +1,4 @@
-package com.comtialsign.bancodigital.services;
+package com.comtialsign.bancodigital.services.impls;
 
 import com.comtialsign.bancodigital.domain.transaction.Transaction;
 import com.comtialsign.bancodigital.domain.user.User;
@@ -31,7 +31,7 @@ public class TransactionService {
         User sender = this.userService.findUserById(transaction.senderId());
         User receiver = this.userService.findUserById(transaction.receiverId());
 
-        userService.validatedUser(sender, transaction.value());
+        userService.validatedTransaction(sender, transaction.value());
 
         Boolean isAuthorized = this.authorizeTransaction(sender, transaction.value());
         if(!isAuthorized){
@@ -50,7 +50,6 @@ public class TransactionService {
         this.repository.save(newTransaction);
         this.userService.saveUser(sender);
         this.userService.saveUser(receiver);
-
     }
 
     public Boolean authorizeTransaction(User sender, BigDecimal value) {

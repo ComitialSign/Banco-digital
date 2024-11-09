@@ -25,7 +25,6 @@ public class User {
     private String document;
     private String password;
     private BigDecimal balance;
-    @Enumerated(EnumType.STRING
-    )
+    @Enumerated(EnumType.STRING)
     private UserType userType;
 }
