@@ -9,6 +9,4 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<User> findUserById(Long id);
 }

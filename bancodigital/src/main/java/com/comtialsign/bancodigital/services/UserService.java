@@ -5,11 +5,14 @@ import com.comtialsign.bancodigital.domain.user.UserType;
 import com.comtialsign.bancodigital.dtos.UserDto;
 import com.comtialsign.bancodigital.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.LockModeType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -26,8 +29,9 @@ public class UserService {
         }
     }
 
-    public User findUserById(Long id) throws Exception{
-        return this.userRepository.findUserById(id).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public User findUserById(Long id) throws EntityNotFoundException {
+        return this.userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
     }
 
 
