@@ -3,7 +3,6 @@ package com.comtialsign.bancodigital.services.impls;
 import com.comtialsign.bancodigital.domain.user.User;
 import com.comtialsign.bancodigital.dtos.NotificationDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -14,11 +13,11 @@ public class NotificationService {
     @Autowired
     private WebClient webClient;
 
-    public Mono<String> sendNotification(User user, String message) {
+    public void sendNotification(User user, String message) {
         String email = user.getEmail();
         NotificationDto notificationDto = new NotificationDto(email, message);
 
-        return webClient.post()
+        webClient.post()
                 .uri("https://util.devi.tools/api/v1/notify")
                 .bodyValue(notificationDto)
                 .exchangeToMono(response -> {
@@ -29,6 +28,5 @@ public class NotificationService {
                     }
                 })
                 .doOnError(ex -> System.out.println("Error: " + ex.getMessage()));
-
     }
 }

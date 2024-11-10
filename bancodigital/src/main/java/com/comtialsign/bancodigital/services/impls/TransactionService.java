@@ -26,7 +26,10 @@ public class TransactionService {
     @Autowired
     private WebClient webClient;
 
-    public void createTransaction(TransactionDto transaction) throws Exception {
+    @Autowired
+    private NotificationService notificationService;
+
+    public Transaction createTransaction(TransactionDto transaction) throws Exception {
         User sender = this.userService.findUserById(transaction.senderId());
         User receiver = this.userService.findUserById(transaction.receiverId());
 
@@ -49,23 +52,30 @@ public class TransactionService {
         this.repository.save(newTransaction);
         this.userService.saveUser(sender);
         this.userService.saveUser(receiver);
+
+        this.notificationService.sendNotification(sender, "Transação realizada com sucesso");
+        this.notificationService.sendNotification(receiver, "Transação recebida com sucesso");
+
+        return newTransaction;
     }
 
     public Boolean authorizeTransaction(User sender, BigDecimal value) {
         try{
-            ResponseEntity<Map<String, String>> authorizationResponse = webClient.get()
+            ResponseEntity<Map<String, Object>> authorizationResponse = webClient.get()
                     .uri("https://util.devi.tools/api/v2/authorize")
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
-                    .toEntity(new ParameterizedTypeReference<Map<String, String>>() {
+                    .toEntity(new ParameterizedTypeReference<Map<String, Object>>() {
                     })
                     .block();
 
             if(authorizationResponse != null && authorizationResponse.getStatusCode().is2xxSuccessful()) {
-                Map<String, String> responseBody = authorizationResponse.getBody();
-                if (responseBody != null) {
-                    String message = responseBody.get("status");
-                    return "success".equals(message);
+                Map<String, Object> responseBody = authorizationResponse.getBody();
+                if (responseBody != null && "success".equals(responseBody.get("status"))) {
+                    Map<String, Object> data = (Map<String, Object>) responseBody.get("data");
+                    if (data != null) {
+                        return Boolean.TRUE.equals(data.get("authorization"));
+                    }
                 }
             }
         } catch (Exception e) {
