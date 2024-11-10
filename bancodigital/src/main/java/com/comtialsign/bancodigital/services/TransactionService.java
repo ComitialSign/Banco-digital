@@ -5,6 +5,7 @@ import com.comtialsign.bancodigital.domain.user.User;
 import com.comtialsign.bancodigital.dtos.TransactionDto;
 import com.comtialsign.bancodigital.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class TransactionService {
     private UserService userService;
 
     @Autowired
-    private TransactionRepository repository;
+    private TransactionRepository transactionRepository;
 
     @Autowired
     private WebClient webClient;
@@ -30,8 +31,11 @@ public class TransactionService {
     @Autowired
     private NotificationService notificationService;
 
+    @Value("${authorization.service.url}")
+    private String authorizationServiceUrl;
+
     @Transactional(timeout = 10)
-    public Transaction createTransaction(TransactionDto transaction) throws Exception {
+    public void createTransaction(TransactionDto transaction) throws Exception {
         User sender = this.userService.findUserById(transaction.senderId());
         User receiver = this.userService.findUserById(transaction.receiverId());
 
@@ -42,29 +46,15 @@ public class TransactionService {
             throw new Exception("Transação não autorizada");
         }
 
-        Transaction newTransaction = new Transaction();
-        newTransaction.setAmount(transaction.value());
-        newTransaction.setSender(sender);
-        newTransaction.setReceiver(receiver);
-        newTransaction.setTimestamp(LocalDateTime.now());
+        notifyUsers(sender, receiver);
 
-        sender.setBalance(sender.getBalance().subtract(transaction.value()));
-        receiver.setBalance(receiver.getBalance().add(transaction.value()));
-
-        this.repository.save(newTransaction);
-        this.userService.saveUser(sender);
-        this.userService.saveUser(receiver);
-
-        this.notificationService.sendNotification(sender, "Transação realizada com sucesso");
-        this.notificationService.sendNotification(receiver, "Transação recebida com sucesso");
-
-        return newTransaction;
+        saveTransaction(sender, receiver, transaction.value());
     }
 
-    public Boolean authorizeTransaction(User sender, BigDecimal value) throws Exception {
+    private Boolean authorizeTransaction(User sender, BigDecimal value) throws Exception {
         try{
             ResponseEntity<Map<String, Object>> authorizationResponse = webClient.get()
-                    .uri("https://util.devi.tools/api/v2/authorize")
+                    .uri(authorizationServiceUrl)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .toEntity(new ParameterizedTypeReference<Map<String, Object>>() {
@@ -84,5 +74,29 @@ public class TransactionService {
             throw new Exception("Erro ao tentar se comunicar com o validador");
         }
         return false;
+    }
+
+    private void saveTransaction(User sender, User receiver, BigDecimal value) throws Exception {
+        Transaction newTransaction = new Transaction();
+        newTransaction.setAmount(value);
+        newTransaction.setSender(sender);
+        newTransaction.setReceiver(receiver);
+        newTransaction.setTimestamp(LocalDateTime.now());
+
+        updateBalances(sender, receiver, value);
+
+        this.transactionRepository.save(newTransaction);
+        this.userService.saveUser(sender);
+        this.userService.saveUser(receiver);
+    }
+
+    private void updateBalances(User sender, User receiver, BigDecimal value) {
+        sender.setBalance(sender.getBalance().subtract(value));
+        receiver.setBalance(receiver.getBalance().add(value));
+    }
+
+    private void notifyUsers(User sender, User receiver) throws Exception {
+        notificationService.sendNotification(sender, "Transação realizada com sucesso");
+        notificationService.sendNotification(receiver, "Transação recebida com sucesso");
     }
 }
