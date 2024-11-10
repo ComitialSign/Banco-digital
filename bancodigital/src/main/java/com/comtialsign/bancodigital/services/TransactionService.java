@@ -1,4 +1,4 @@
-package com.comtialsign.bancodigital.services.impls;
+package com.comtialsign.bancodigital.services;
 
 import com.comtialsign.bancodigital.domain.transaction.Transaction;
 import com.comtialsign.bancodigital.domain.user.User;
@@ -59,7 +59,7 @@ public class TransactionService {
         return newTransaction;
     }
 
-    public Boolean authorizeTransaction(User sender, BigDecimal value) {
+    public Boolean authorizeTransaction(User sender, BigDecimal value) throws Exception {
         try{
             ResponseEntity<Map<String, Object>> authorizationResponse = webClient.get()
                     .uri("https://util.devi.tools/api/v2/authorize")
@@ -79,7 +79,7 @@ public class TransactionService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new Exception("Erro ao tentar se comunicar com o validador");
         }
         return false;
     }

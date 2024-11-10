@@ -1,4 +1,4 @@
-package com.comtialsign.bancodigital.services.impls;
+package com.comtialsign.bancodigital.services;
 
 import com.comtialsign.bancodigital.domain.user.User;
 import com.comtialsign.bancodigital.dtos.NotificationDto;
@@ -13,9 +13,10 @@ public class NotificationService {
     @Autowired
     private WebClient webClient;
 
-    public void sendNotification(User user, String message) {
+    public void sendNotification(User user, String message) throws Exception{
         String email = user.getEmail();
         NotificationDto notificationDto = new NotificationDto(email, message);
+
 
         webClient.post()
                 .uri("https://util.devi.tools/api/v1/notify")
@@ -27,6 +28,6 @@ public class NotificationService {
                         return response.createException().flatMap(Mono::error);
                     }
                 })
-                .doOnError(ex -> System.out.println("Error: " + ex.getMessage()));
+                .doOnNext(e -> {throw new RuntimeException("Erro ao tentar enviar notificação ao email");});
     }
 }

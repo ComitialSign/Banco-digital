@@ -1,9 +1,10 @@
-package com.comtialsign.bancodigital.services.impls;
+package com.comtialsign.bancodigital.services;
 
 import com.comtialsign.bancodigital.domain.user.User;
 import com.comtialsign.bancodigital.domain.user.UserType;
 import com.comtialsign.bancodigital.dtos.UserDto;
 import com.comtialsign.bancodigital.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +27,9 @@ public class UserService {
     }
 
     public User findUserById(Long id) throws Exception{
-        return this.userRepository.findUserById(id).orElseThrow(() -> new Exception("Usuário não encontrado"));
+        return this.userRepository.findUserById(id).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
     }
+
 
     public void saveUser(User user) throws Exception{
         this.userRepository.save(user);

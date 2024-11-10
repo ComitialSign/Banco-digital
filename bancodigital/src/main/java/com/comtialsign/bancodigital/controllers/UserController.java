@@ -2,7 +2,7 @@ package com.comtialsign.bancodigital.controllers;
 
 import com.comtialsign.bancodigital.domain.user.User;
 import com.comtialsign.bancodigital.dtos.UserDto;
-import com.comtialsign.bancodigital.services.impls.UserService;
+import com.comtialsign.bancodigital.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
