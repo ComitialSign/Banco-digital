@@ -8,6 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+/**
+ * Serviço responsável pelo envio de notificações a usuários após uma transação for concluida.
+ *
+ * <p>O {@code NotificationService} usa um {@link WebClient} para fazer chamadas
+ * HTTP ao serviço de notificação configurado via {@code notification.service.url}.
+ * Este serviço envia mensagens personalizadas para o email dos usuários.</p>
+ */
 @Service
 public class NotificationService {
 
@@ -17,6 +24,14 @@ public class NotificationService {
     @Value("${notification.service.url}")
     private String notificationServiceUrl;
 
+
+    /**
+     * Envia uma notificação para o usuário especificado com uma mensagem customizada.
+     *
+     * @param user   Usuário que receberá a notificação. O email será obtido a partir deste objeto.
+     * @param message Mensagem personalizada que será enviada ao usuário.
+     * @throws Exception se ocorrer um erro ao tentar enviar a notificação.
+     */
     public void sendNotification(User user, String message) throws Exception{
         String email = user.getEmail();
         NotificationDto notificationDto = new NotificationDto(email, message);
